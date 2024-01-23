@@ -1,5 +1,6 @@
 package gb.spring.library.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -14,4 +15,5 @@ public class Book {
     public Book(String name) {
         this(sequence++, name);
     }
+
 }
