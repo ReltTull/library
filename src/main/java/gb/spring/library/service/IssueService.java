@@ -7,6 +7,7 @@ import gb.spring.library.repository.BookRepository;
 import gb.spring.library.repository.IssueRepository;
 import gb.spring.library.repository.ReaderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.core.env.Environment;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -64,8 +66,9 @@ public class IssueService {
     /**
      * Использование значения, заданного в файле .yml
      */
-    @Value("${max-allowed-books}")
-    private int maxAllowedBooks;
+    @Value("${application.max-allowed-books}")
+    private String maxAllowedBooks;
+
 //
     /**
      * Проверка, не превышен ли лимит выданных книг у читателя. Ищет Issue, где idReader совпадает с искомым и
@@ -77,7 +80,7 @@ public class IssueService {
         int lim = 0;
         List<Issue> i = issueRepository.getIssues().stream()
                 .filter(issue -> issue.getReaderId() == reader.getId()).toList();
-        return i.size() > maxAllowedBooks;
+        return i.size() > Integer.parseInt(maxAllowedBooks);
     }
 
 }
