@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-@ImportResource("classpath:application.yml")
+//@ImportResource("classpath:application.yml")
 public class IssueService {
 
     private final BookRepository bookRepository;
