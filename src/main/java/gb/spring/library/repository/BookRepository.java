@@ -10,6 +10,10 @@ import java.util.Objects;
 
 @Repository
 public class BookRepository {
+    public List<Book> getBooks() {
+        return books;
+    }
+
     private final List<Book> books;
 
     public BookRepository() {

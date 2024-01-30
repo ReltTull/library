@@ -9,7 +9,6 @@ import java.util.List;
 
 @Repository
 public class IssueRepository {
-
     private final List<Issue> issues;
 
     public List<Issue> getIssues() {

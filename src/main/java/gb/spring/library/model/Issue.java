@@ -3,7 +3,6 @@ package gb.spring.library.model;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 public class Issue {
@@ -19,13 +18,20 @@ public class Issue {
     /**
      * Дата выдачи
      */
-    private final LocalDateTime timestamp;
+    private final LocalDateTime issueTime;
+
+    /**
+     * Дата возврата
+     */
+    private final LocalDateTime refundTime;
 
     public Issue(long bookId, long readerId) {
         this.id = sequence++;
         this.bookId = bookId;
         this.readerId = readerId;
-        this.timestamp = LocalDateTime.now();
+        this.issueTime = LocalDateTime.now();
         this.isReturned = false;
+        this.refundTime = null;
     }
+
 }

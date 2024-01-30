@@ -1,5 +1,6 @@
 package gb.spring.library.repository;
 
+import gb.spring.library.model.Book;
 import gb.spring.library.model.Reader;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
@@ -38,5 +39,9 @@ public class ReaderRepository {
 
     public void deleteReader(long id) {
         readers.remove(id);
+    }
+
+    public List<Reader> getReaders() {
+        return readers;
     }
 }

@@ -1,6 +1,7 @@
 package gb.spring.library.service;
 
 import gb.spring.library.api.IssueRequest;
+import gb.spring.library.exceptions.ExceedingReadersBookLimitException;
 import gb.spring.library.model.Issue;
 import gb.spring.library.model.Reader;
 import gb.spring.library.repository.BookRepository;
@@ -25,22 +26,14 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 //@ImportResource("classpath:application.yml")
 public class IssueService {
-
-    private final BookRepository bookRepository;
-
-    private final ReaderRepository readerRepository;
-
-    public IssueRepository getIssueRepository() {
-        return issueRepository;
-    }
-
     private final IssueRepository issueRepository;
-
-    @GetMapping("/{id}")
-    @ResponseBody
-    public Issue getIssueById(@PathVariable long id) {
-        return issueRepository.getIssueById(id);
-    }
+    private final BookRepository bookRepository;
+    private final ReaderRepository readerRepository;
+    /**
+     * Использование значения, заданного в файле .yml
+     */
+    @Value("${application.max-allowed-books}")
+    private String maxAllowedBooks;
 
     public Issue issue(IssueRequest request) {
         if (bookRepository.getBookById(request.getBookId()) == null) {
@@ -50,26 +43,33 @@ public class IssueService {
             throw new NoSuchElementException("Не найден читатель с идентификатором \"" + request.getReaderId() + "\"");
         }
         // можно проверить, что у читателя нет книг на руках (или его лимит не превышает в Х книг)
-        if (isBookLimit(readerRepository.getReaderById(request.getReaderId()))) {
-
+        if (!isBookLimit(readerRepository.getReaderById(request.getReaderId()))) {
+            throw new ExceedingReadersBookLimitException("Reader's book limit is excess!");
         }
-
         Issue issue = new Issue(request.getBookId(), request.getReaderId());
         issueRepository.save(issue);
         return issue;
     }
+    public IssueRepository getRepository () {
+        return issueRepository;
+    }
+    @GetMapping("/{id}")
+    @ResponseBody
+    public Issue getIssueById(@PathVariable long id) {
+        return issueRepository.getIssueById(id);
+    }
 
+
+    public String getBookNameById(long id){
+        return bookRepository.getBookById(id).getName();
+    }
+    public String getReaderNameById(long id) {
+        return readerRepository.getReaderById(id).getName();
+    }
     public void returnBook(long id) {
         issueRepository.returnBook(id);
     }
 
-    /**
-     * Использование значения, заданного в файле .yml
-     */
-    @Value("${application.max-allowed-books}")
-    private String maxAllowedBooks;
-
-//
     /**
      * Проверка, не превышен ли лимит выданных книг у читателя. Ищет Issue, где idReader совпадает с искомым и
      * добавляет в отдельный лист, с размером которого сравнивается число допустимых книг на руках.
@@ -82,5 +82,4 @@ public class IssueService {
                 .filter(issue -> issue.getReaderId() == reader.getId()).toList();
         return i.size() > Integer.parseInt(maxAllowedBooks);
     }
-
 }
